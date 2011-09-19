@@ -11,6 +11,7 @@ fi
   PHONES=$4
   write_log "SMS Send..."
   write_log "Massage : $MESSAGE"
+  MESSAGE=`echo $MESSAGE | tr " " "+"`
   COUNT_FIELD=`echo $PHONES |awk -F"," '{print NF}'`
   i=1 
   write_log "Phone : $COUNT_FIELD Number"

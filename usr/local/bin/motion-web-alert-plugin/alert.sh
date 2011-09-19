@@ -30,6 +30,7 @@ PHONES=`get_val_config "PHONES="`
 #Username && Password API Send SMS www.inanosms.com
 SMS_SEND_USER=`get_val_config "SMS_SEND_USER="`
 SMS_SEND_PASSWORD=`get_val_config "SMS_SEND_PASSWORD="`
+SMART_PHONES=`get_val_config "SMART_PHONES="`
 SMS_PHONES="$PHONES"
 
 #VIDEO Name && MSG && Type Alert 
@@ -53,13 +54,6 @@ VIDEO_PATH=`echo $1|awk -F"/CAMERA" '{print $1}'`
 ALERT_PATH='ALERT/INTRU'
 IMG_SEC=`get_val_config "IMG_SEC="`
 IMG_PATH="$VIDEO_PATH/$ALERT_PATH/$NAME.jpg"
-
-#val status
-CON='Failed!'
-UPLOAD='Failed!'
-SHORT='Failed!'
-TWEET='Failed!'
-SMS='Failed!'
 
 save_images(){
   write_log "Save images..."
@@ -122,56 +116,56 @@ check_time(){
 alert(){
   img=$1
   #====check day
-  [ `check_day` -eq 0 ] || write_log "Today Not Alert!"; return 0
-  write_log "Pass"
+  if [ `check_day` -eq 2 ]; then write_log "Today Not Alert!"; return 0; fi 
   #====check time
-  [ `check_time` -eq 0 ] || write_log "This Time Not Alert!"; return 0
+  if [ `check_time` -eq 2 ]; then write_log "This Time Not Alert!"; return 0; fi
   #====check tweet&&sms on,off
-  [ ! $TWEET_ON -eq 1 ] && [ ! $SMS_ON -eq 1 ] && ( write_log "TWEET && SMS = 'OFF'"; return 0 )
+  if [ ! $TWEET_ON -eq 1 ] && [ ! $SMS_ON -eq 1 ]; then write_log "TWEET && SMS = 'OFF'"; return 0; fi
   #====check internet connection
-  [ `./check_connection.sh` -eq 2 ] && return 0 || CON='Ok'
+  [ `./check_connection.sh` -eq 0 ] || return 0
   #====resize images
-  URL=''
-  img_resize=''
+  URL=""
+  img_resize="./img_default_1.jpg"
   if [ $img -eq 0 ]
   then
-    img_resize=`./images_resize $IMG_PATH`
+    img_resize=`./images_resize.sh $IMG_PATH`
     if [ $SMS_ON -eq 0 ]
     then
-      #====upload images return url 
-      url_l=`./images_upload.sh $img_resize`
-      if [ $url_l != "-" ]
+      if [ $SMART_PHONES -eq 0 ] && [ $TWEET_ON -eq 0 ]
       then
-        UPLOAD='Ok'
-        url_s=`./short_url.sh $SHORT_URL_USER $SHORT_URL_KEY $url_l`
-        if [ $url_s != "-" ]
-        then
-          SHORT='Ok'
-          URL=$url_s
-        else
-          URL=$url_l
+        #====upload images return url 
+        url_l=`./images_upload.sh $img_resize`
+        if [ $url_l != "-" ]
+          then
+            url_s=`./short_url.sh $SHORT_URL_USER $SHORT_URL_KEY $url_l`
+          if [ $url_s != "-" ]
+          then
+            URL=$url_s
+          else
+            URL=$url_l
+          fi
         fi
+        #____upload images
       fi
-      #____upload images
     fi
+    if [ -z $img_resize ]; then `rm $img_resize` ; fi
   fi
   #====check tweet on,off
+  url_tweet=''
   if [ $TWEET_ON -eq 1 ]
   then
-    if [ `./tweet.sh $twitter_user $twitter_pass $img_resize $TYPE_ALERT $MSG_ALERT` -eq 0 ]
-    then
-      TWEET='Ok'
-    fi
+     url_tweet=`./tweet.sh $twitter_user $twitter_pass $img_resize $TYPE_ALERT $MSG_ALERT`
   else
     write_log "TWEET OFF"
   fi
   #====check sms on,off
   if [ $SMS_ON -eq 1 ]
   then
-    `./sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`
-    if [ $? -eq 0 ]
+    if [ $SMART_PHONES -eq 1 ] && [ $TWEET_ON -eq 1 ]
     then
-      SMS='Ok'
+      `./sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet" $PHONES`
+    else
+      `./sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`	
     fi
   else
     write_log "SMS OFF"
@@ -187,7 +181,5 @@ then
 fi
 #_______ MAIN _______
 
-write_log ":: CON=$CON , UPLOAD=$UPLOAD , SHORT=$SHORT , TWEET=$TWEET , SMS=$SMS"
 write_log "==== ALERT END ===="
 write_line
-
