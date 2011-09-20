@@ -1,5 +1,5 @@
 #!/bin/sh
-. /usr/local/bin/motion-web-alert-plugin/write_log.sh
+. ./write_log.sh
 if [ -z $1 ]
 then 
   echo "Ex."
@@ -12,8 +12,6 @@ write_line
 #Config path && Read configuration
 CONF='/etc/motion-web-alert-plugin'
 FILE_CONF='motion-web-alert-plugin.conf'
-RUN_SCRIPT=' /usr/local/bin/motion-web-alert-plugin'
-IMG_DEFAULT='/usr/local/bin/motion-web-alert-plugin/img_default_1.jpg'
 READ_ALL_CONF=`cat $CONF/$FILE_CONF`
 
 #Return value Configuration
@@ -28,9 +26,6 @@ SMS_ON=`get_val_config "SMS_ON="`
 
 #Phone number
 PHONES=`get_val_config "PHONES="`
-
-#API KEY Imgur Upload Images
-IMGUR_KEY=`get_val_config "IMGUR_KEY="`
 
 #Username && Password API Send SMS www.inanosms.com
 SMS_SEND_USER=`get_val_config "SMS_SEND_USER="`
@@ -118,13 +113,6 @@ check_time(){
   [ $NOW -ge $START ] && [ $NOW -le $END ] &&  echo 0 ||  echo 2
 }
 
-images_resize(){
-  write_log "Resize images..."
-  convert -resize 320x240 -quality 80 $1 /tmp/temp_pic_$$.jpg 2>/dev/null \
- && ( write_log "  Resize : Ok"; echo "/tmp/temp_pic_$$.jpg" ) || ( write_log "  Resize : Failed!"; echo "-" )
-  write_line
-}
-
 alert(){
   img=$1
   #====check day
@@ -134,24 +122,22 @@ alert(){
   #====check tweet&&sms on,off
   if [ ! $TWEET_ON -eq 1 ] && [ ! $SMS_ON -eq 1 ]; then write_log "TWEET && SMS = 'OFF'"; return 0; fi
   #====check internet connection
-  [ `$RUN_SCRIPT/check_connection.sh` -eq 0 ] || return 0
+  [ `./check_connection.sh` -eq 0 ] || return 0
   #====resize images
   URL=""
-  img_resize="$IMG_DEFAULT"
+  img_resize="./img_default_1.jpg"
   if [ $img -eq 0 ]
   then
-    #====check resize
-    r_pic=`images_resize "$IMG_PATH"`
-    [ ! $r_pic = "-" ] && img_resize=$r_pic
+    img_resize=`./images_resize.sh $IMG_PATH`
     if [ $SMS_ON -eq 1 ]
     then
       if [ $SMART_PHONES -eq 0 ] || [ $TWEET_ON -eq 0 ]
       then
         #====upload images return url 
-        url_l=`$RUN_SCRIPT/images_upload.sh $IMGUR_KEY $img_resize`
+        url_l=`./images_upload.sh $img_resize`
         if [ $url_l != "-" ]
           then
-            url_s=`$RUN_SCRIPT/short_url.sh $SHORT_URL_USER $SHORT_URL_KEY $url_l`
+            url_s=`./short_url.sh $SHORT_URL_USER $SHORT_URL_KEY $url_l`
           if [ $url_s != "-" ]
           then
             URL=$url_s
@@ -167,7 +153,7 @@ alert(){
   url_tweet=''
   if [ $TWEET_ON -eq 1 ]
   then
-     url_tweet=`$RUN_SCRIPT/tweet.sh $twitter_user $twitter_pass $img_resize $TYPE_ALERT "$MSG_ALERT"`
+     url_tweet=`./tweet.sh $twitter_user $twitter_pass $img_resize $TYPE_ALERT $MSG_ALERT`
   else
     write_log "TWEET OFF"
   fi
@@ -178,9 +164,9 @@ alert(){
   then
     if [ $SMART_PHONES -eq 1 ] && [ $TWEET_ON -eq 1 ]
     then
-      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet" $PHONES`
+      `./sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet" $PHONES`
     else
-      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`	
+      `./sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`	
     fi
   else
     write_log "SMS OFF"
@@ -188,7 +174,7 @@ alert(){
 }
 
 #======= MAIN ========
-if [ `check_motion` -eq 0 ]
+if [ `check_motion` -eq 2 ]
 then
   IMG_SAVE=`save_images`
   [ $ALERT_ON -eq 0 ] && ( write_log "System Alert 'OFF'"; write_line ) ||\
@@ -198,4 +184,3 @@ fi
 
 write_log "==== ALERT END ===="
 write_line
-exit

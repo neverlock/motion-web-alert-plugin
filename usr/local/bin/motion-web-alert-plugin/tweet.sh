@@ -1,15 +1,23 @@
 #!/bin/sh
-if [ -z $1 ]; then echo "\nEx.\n    ./tweet.sh twitter_user twitter_pass @photo type_alert 'your message'\n";  return 0; fi
-
-. /usr/local/bin/motion-web-alert-plugin/write_log.sh
+if [ -z $1 ]
+  then
+    echo "\nEx.\n    ./tweet.sh twitter_user twitter_pass photo_file type_alert 'your message tweet'\n"
+    return 0
+fi
+. ./write_log.sh
   write_log "Tweet..."
   NOW=`date '+[%d/%m/%Y-%H:%M:%S]'`
+
   UPLOAD_URL="http://twitpic.com/api/uploadAndPost"
   TWITTER_USER=$1
-  TWITTER_PW=$2
-  PHOTO=$3
-  STATUS=$4
-  TWEET_MSG="$NOW[$STATUS] $5"
+  shift
+  TWITTER_PW=$1
+  shift
+  PHOTO=$1
+  shift
+  STATUS=$1
+  shift
+  TWEET_MSG="$NOW[$STATUS] $*"
   write_log "Massage : $TWEET_MSG @URL"
   
   run=`curl \

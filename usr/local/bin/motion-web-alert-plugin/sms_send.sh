@@ -1,7 +1,10 @@
 #!/bin/sh
-if [ -z $1 ]; then echo "\nEx.\n    ./sms_send.sh username password 'your message' 0812345678,0987654321\n"; return 0; fi
-
-. /usr/local/bin/motion-web-alert-plugin/write_log.sh
+if [ -z $1 ]
+  then
+    echo "\nEx.\n    ./sms_send.sh username password 'your message' 0812345678,0987654321\n"
+    return 0
+fi
+. ./write_log.sh
   USERNAME=$1
   PASSWORD=$2
   MESSAGE=$3
