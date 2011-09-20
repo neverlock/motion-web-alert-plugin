@@ -178,7 +178,7 @@ alert(){
   then
     if [ $SMART_PHONES -eq 1 ] && [ $TWEET_ON -eq 1 ]
     then
-      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet" $PHONES`
+      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet/full" $PHONES`
     else
       `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`	
     fi
