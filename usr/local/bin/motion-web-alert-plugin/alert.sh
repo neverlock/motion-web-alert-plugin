@@ -129,9 +129,9 @@ alert(){
   if [ $img -eq 0 ]
   then
     img_resize=`./images_resize.sh $IMG_PATH`
-    if [ $SMS_ON -eq 0 ]
+    if [ $SMS_ON -eq 1 ]
     then
-      if [ $SMART_PHONES -eq 0 ] && [ $TWEET_ON -eq 0 ]
+      if [ $SMART_PHONES -eq 0 ] || [ $TWEET_ON -eq 0 ]
       then
         #====upload images return url 
         url_l=`./images_upload.sh $img_resize`

@@ -13,7 +13,7 @@ fi
   write_log "Massage : $MESSAGE"
   MESSAGE=`echo $MESSAGE | tr " " "+"`
   COUNT_FIELD=`echo $PHONES |awk -F"," '{print NF}'`
-  i=1 
+  i=1
   write_log "Phone : $COUNT_FIELD Number"
   echo $PHONES | tr ',' "\n" | while read PhoneNO
   do
