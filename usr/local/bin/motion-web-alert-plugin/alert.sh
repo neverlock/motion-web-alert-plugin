@@ -148,7 +148,6 @@ alert(){
         #____upload images
       fi
     fi
-    if [ -z $img_resize ]; then `rm $img_resize` ; fi
   fi
   #====check tweet on,off
   url_tweet=''
@@ -158,6 +157,8 @@ alert(){
   else
     write_log "TWEET OFF"
   fi
+  #====delete images temp
+  if [ ! -z $img_resize ]; then `rm $img_resize` ; fi
   #====check sms on,off
   if [ $SMS_ON -eq 1 ]
   then

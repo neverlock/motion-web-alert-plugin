@@ -25,7 +25,7 @@ fi
   --form password=$TWITTER_PW \
   --form media=@"$PHOTO" \
   --form message="$TWEET_MSG" $UPLOAD_URL 2>/dev/null`
-  
+ 
   result=`echo $run | awk -F'status="' '{print $2}' | awk -F'"' '{print $1}'`
   url=`echo $run | awk -F'<mediaurl>' '{print $2}' | awk -F'</mediaurl>' '{print $1}'`
   if [ ! -z $url ]; then write_log "@URL = $url"; fi
