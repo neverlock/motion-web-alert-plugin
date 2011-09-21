@@ -137,6 +137,7 @@ alert(){
   [ `$RUN_SCRIPT/check_connection.sh` -eq 0 ] || return 0
   #====resize images
   URL=""
+  r_pic=""
   img_resize="$IMG_DEFAULT"
   if [ $img -eq 0 ]
   then
@@ -172,13 +173,16 @@ alert(){
     write_log "TWEET OFF"
   fi
   #====delete images temp
-  if [ ! -z $img_resize ]; then `rm $img_resize` ; fi
+  if [ ! -z $r_pic ]; then `rm $r_pic` ; fi
   #====check sms on,off
   if [ $SMS_ON -eq 1 ]
   then
     if [ $SMART_PHONES -eq 1 ] && [ $TWEET_ON -eq 1 ]
     then
-      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_tweet/full" $PHONES`
+      url_sms="$url_tweet/full"
+      url_sms_s=`$RUN_SCRIPT/short_url.sh $SHORT_URL_USER $SHORT_URL_KEY "$url_sms"`
+      [ $url_sms_s != "-" ] && url_sms=$url_sms_s
+      `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $url_sms" $PHONES`
     else
       `$RUN_SCRIPT/sms_send.sh $SMS_SEND_USER $SMS_SEND_PASSWORD "$MSG_ALERT $URL" $PHONES`	
     fi
