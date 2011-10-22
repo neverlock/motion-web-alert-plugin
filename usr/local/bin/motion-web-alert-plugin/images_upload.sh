@@ -1,5 +1,7 @@
 #!/bin/sh
-if [ -z $1 ]; then echo "\nEx.\n    ./images_upload.sh 'images path'\n"; return 0; fi
+#upload image from image path 
+#return image URL(not shot URL)
+if [ -z "$1" ]; then echo "\nEx.\n\t./images_upload.sh 'api kay' 'images path'\n"; return 0; fi
 . /usr/local/bin/motion-web-alert-plugin/write_log.sh
   img_path=$2
   api_key=$1
@@ -9,4 +11,3 @@ if [ -z $1 ]; then echo "\nEx.\n    ./images_upload.sh 'images path'\n"; return 
   result=`echo $result | awk -F '<original>' '{print $2}' | awk -F '</original>' '{print $1}'`
   [ -z $result ] && ( write_log "Upload : Failed!"; echo "-" ) ||\
  ( write_log "Upload : Ok"; write_log "Images URL : $result"; echo $result; )
-write_line

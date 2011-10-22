@@ -5,4 +5,3 @@
   result=$?
   [ $result -eq 0 ] && write_log "Connection : Ok" || write_log "Connection : Failed!"
 echo $result
-write_line

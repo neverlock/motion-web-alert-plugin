@@ -16,6 +16,13 @@ Plugin : motion
     - images upload -> imgur
     - func auto select images upload
 
+  + v 0.4
+    - modified main function
+    - add group conf
+    - add thread conf
+    - del fonc smart phone
+    - add config
+
 --------------------------
 COOP OSSL NECTEC :  Chagridsada Boonthus
 
