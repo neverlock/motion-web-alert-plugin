@@ -10,7 +10,7 @@ if [ -z "$READ_CONF" ]; then write_log 'load config Failed!'; return 0 ; fi
 
 #Return Configuration value
 load_config(){
-  echo "$READ_CONF" | tr '|' "\n" | grep "$1=" | awk -F"$1=" '{print $2}'
+  echo "$READ_CONF" | tr '|' "\n" | grep "^$1=" | awk -F"$1=" '{print $2}'
 }
 
 ALERT_ON=`load_config 'ALERT_ON'`

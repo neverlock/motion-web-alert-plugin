@@ -114,8 +114,12 @@ alert(){
   #====check time
   if [ "`check_time`" != "0" ]; then write_log "This Time Not Alert!"; return 0; fi
   #====check tweet&&sms on,off
-  [ "$SMS_ON" = "1" ] && [ "$INTRUDE_SMS_ON" = "1" ] || if [ "$TWITTER_ON" != "1" ] || [ "$INTRUDE_TWITTER_ON" != "1" ];\
-  then write_log "TWEET && SMS = 'OFF'" ; return 0 ; fi 
+  if [ "$SMS_ON" != "1" ] || [ "$INTRUDE_SMS_ON" != "1" ]
+  then 
+    if [ "$TWITTER_ON" != "1" ] || [ "$INTRUDE_TWITTER_ON" != "1" ]
+    then write_log "TWEET && SMS = 'OFF'" ; return 0
+    fi 
+  fi
   #====check internet connection
   [ `$PATH_SCRIPT/check_connection.sh` -eq 0 ] || return 0
   #====resize images
@@ -128,7 +132,7 @@ alert(){
   #====check tweet on,off
   if [ "$TWITTER_ON" = "1" ] && [ "$INTRUDE_TWITTER_ON" = "1" ] 
   then
-     url_tweet=`$PATH_SCRIPT/tweet.sh "$INTRUDE_TWITTER_USER" "$INTRUDE_TWITTER_PASS" "$img_resize" "$TYPE_ALERT" "$POWERDOWN_TWITTER_MSG"`
+     url_tweet=`$PATH_SCRIPT/tweet.sh "$INTRUDE_TWITTER_USER" "$INTRUDE_TWITTER_PASS" "$img_resize" "$TYPE_ALERT" "$INTRUDE_TWITTER_MSG"`
   else
     write_log "TWEET OFF"
   fi

@@ -23,6 +23,9 @@ Plugin : motion
     - del fonc smart phone
     - add config
 
+  + v 0.5
+    - script clear video
+    - fix bug alert.sh
 --------------------------
 COOP OSSL NECTEC :  Chagridsada Boonthus
 
