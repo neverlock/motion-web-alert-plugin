@@ -1,4 +1,4 @@
-motion-web-alert-plugin
+mtion-web-alert-plugin
 ==================================
 
 Alert motion ticker and Web control
@@ -26,6 +26,8 @@ Plugin : motion
   + v 0.5
     - script clear video
     - fix bug alert.sh
+
+
 --------------------------
 COOP OSSL NECTEC :  Chagridsada Boonthus
 
