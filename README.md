@@ -26,6 +26,8 @@ Plugin : motion
   + v 0.5
     - script clear video
     - fix bug alert.sh
+    - add power_dwon.sh
+    - ups script
 
 
 --------------------------

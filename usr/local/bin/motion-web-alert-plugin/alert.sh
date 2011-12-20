@@ -17,7 +17,26 @@ CAM_NO=`echo $FILE_VIDEO|awk -F'CAMERA' '{print $2}'|awk -F'_' '{print $1}'`
 NAME_VIDEO="CAMERA`echo $FILE_VIDEO|awk -F'CAMERA' '{print $2}'|awk -F'.' '{print $1}'`"
 PATH_VIDEO=`echo $FILE_VIDEO|awk -F"/CAMERA" '{print $1}'`
 PATH_ALERT='ALERT/INTRU'
+PATH_POWER='ALERT/POWER'
 FILE_IMG="$PATH_VIDEO/$PATH_ALERT/$NAME_VIDEO.jpg"
+FILE_POWER="$PATH_VIDEO/$PATH_POWER/$NAME_VIDEO.txt"
+
+check_power(){
+  write_log 'Check power down...'
+  STATUS=`cat /etc/motion-web-alert-plugin/alert.power`
+  if [ "$STATUS" = "1" ]
+  then
+    if [ ! -d "$PATH_VIDEO/$PATH_POWER" ]
+    then
+      write_log "Make DIR = $PATH_VIDEO/$PATH_POWER"
+      mkdir -p $PATH_VIDEO/$PATH_POWER 2>/dev/null && write_log "Make DIR Ok" || write_log "Make DIR Failed!"
+    else
+      write_log "DIR = $PATH_VIDEO/$PATH_POWER"
+    fi
+    touch $FILE_POWER
+  fi
+  write_log 'Check power Ok'
+}
 
 save_images(){
   write_log 'Save images...'
@@ -157,6 +176,7 @@ alert(){
 }
 
 #======= MAIN ========
+check_power
 if [ "`check_motion`" = "0" ]
 then
   IMG_SAVE=`save_images`
