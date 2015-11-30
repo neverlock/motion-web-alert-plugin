@@ -132,11 +132,16 @@ alert(){
   if [ "`check_day`" != "0" ]; then write_log "Today Not Alert!"; return 0; fi 
   #====check time
   if [ "`check_time`" != "0" ]; then write_log "This Time Not Alert!"; return 0; fi
+  #====send alarm sig
+  `$PATH_SCRIPT/alarm_sig.sh start 1`
   #====check tweet&&sms on,off
   if [ "$SMS_ON" != "1" ] || [ "$INTRUDE_SMS_ON" != "1" ]
   then 
     if [ "$TWITTER_ON" != "1" ] || [ "$INTRUDE_TWITTER_ON" != "1" ]
-    then write_log "TWEET && SMS = 'OFF'" ; return 0
+    then
+      if [ "$PUSHBULLET_ON" != "1" ] || [ "$INTRUDE_PUSHBULLET_ON" != "1" ]
+       then write_log "TWEET && SMS = 'OFF'" ; return 0
+      fi
     fi 
   fi
   #====check internet connection
@@ -170,6 +175,22 @@ alert(){
     `$PATH_SCRIPT/sms_send.sh "$SMS_GATEWAY_USER" "$SMS_GATEWAY_PASSWORD" "$SMS_GATEWAY_URL" "$SMS_GATEWAY_POST" "$INTRUDE_SMS_MSG" "$URL_IMAGE" "$INTRUDE_SMS_PHONE"`
   else
     write_log "SMS OFF"
+  fi 
+  #=== pushbullet 
+  if [ "$PUSHBULLET_ON" = "1" ] && [ "$INTRUDE_PUSHBULLET_ON" = "1" ]
+  then
+    #====upload images return url 
+    URL_IMAGE=''
+    url_long=`$PATH_SCRIPT/images_upload.sh "$IMGUR_KEY" $img_resize`
+    if [ "$url_long" != "-" ]
+    then
+      url_short=`$PATH_SCRIPT/short_url.sh $SHORT_URL_USER $SHORT_URL_KEY "$url_long"`
+      [ "$url_short" != "-" ] && URL_IMAGE=$url_short || URL_IMAGE=$url_long
+    fi
+    #====pushbullet send
+    `$PATH_SCRIPT/pushbullet_send.sh "$INTRUDE_PUSHBULLET_MSG" "$INTRUDE_PUSHBULLET_TOKEN" "$INTRUDE_PUSHBULLET_CHANNEL" "$URL_IMAGE"`
+  else
+    write_log "PUSHBULLET OFF"
   fi 
   #====delete images temp
   if [ "$img_resize" != "$IMG_DEFAULT" ]; then `rm $img_resize` ; fi

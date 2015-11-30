@@ -7,7 +7,7 @@
 DAYS=$REMOVE_DAY
 MINSPACE=$REMOVE_SIZE
 MINDAYS=1
-V_DIR='/var/www/Surveillance';
+V_DIR='/var/www/html/Surveillance';
 
 #if [ ! -f /etc/surveillance/node ]
 #then
